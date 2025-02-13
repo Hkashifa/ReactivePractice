@@ -39,8 +39,8 @@ public class OrderController {
         return orderService.findByFirstname(name);
     }
 
-//    @DeleteMapping("/{id}")
-//    public void deleteById(@PathVariable Long id) {
-//        orderService.deleteById(id);
-//    }
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Long id) {
+        orderService.deleteById(id);
+    }
 }

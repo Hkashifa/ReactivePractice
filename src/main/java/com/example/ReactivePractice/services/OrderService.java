@@ -35,12 +35,12 @@ public class OrderService {
         );
     }
 
-    public Flux<Order> findByFirstname(String firstname) {
-        return orderRepository.findAllByFirstnameContainingIgnoreCase(firstname);
+    public Flux<Order> findByFirstname(String item) {
+        return orderRepository.findAllByItemContainingIgnoreCase(item);
     }
 
-//    public void deleteById(Long id) {
-//        return orderRepository.deleteById(id).subscribe();
-//    }
+    public void deleteById(Long id) {
+        orderRepository.deleteById(id).subscribe();
+    }
 
 }

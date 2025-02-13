@@ -8,6 +8,6 @@ import reactor.core.publisher.Flux;
 
 public interface OrderRepository extends ReactiveCrudRepository<Order, Long> {
 
-    Flux<Order> findAllByFirstnameContainingIgnoreCase(String firstname);
+    Flux<Order> findAllByItemContainingIgnoreCase(String item);
 
 }
