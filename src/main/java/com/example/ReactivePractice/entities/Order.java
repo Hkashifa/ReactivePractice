@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @AllArgsConstructor
 @Builder
-@Table("order")
+@Table("orders")
 public class Order {
 
     @Id

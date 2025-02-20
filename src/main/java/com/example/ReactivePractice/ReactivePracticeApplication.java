@@ -1,7 +1,6 @@
 package com.example.ReactivePractice;
 
 import com.example.ReactivePractice.entities.Order;
-import com.example.ReactivePractice.enums.OrderStatus;
 import com.example.ReactivePractice.repositories.OrderRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -18,19 +17,25 @@ public class ReactivePracticeApplication {
     }
 
 
+    @Bean
+    public CommandLineRunner runner(OrderRepository repository) {
+        return args -> {
+            for (int i = 0; i < 1; i++) {
+                repository.save(
+                                Order.builder()
+                                        .orderStatus(PREPARING)
+                                        .item("Test")
+                                        .price(i)
+                                        .build()
+                        )
+                        .doOnError(error -> {
 
-	@Bean
-	public CommandLineRunner runner(OrderRepository repository) {
-		return args -> {
-			for (int i = 0; i < 3000; i++) {
-				repository.save(
-                        Order.builder()
-                                .orderStatus(OrderStatus.valueOf(String.valueOf(PREPARING)))
-                                .item("Test"+i)
-                                .price(i)
-                                .build()
-				).subscribe();
-			}
-		};
-	}
+                            System.err.println("Error occurred while saving order: " + error.getMessage());
+                        })
+                        .subscribe();
+            }
+        };
+    }
+
+
 }

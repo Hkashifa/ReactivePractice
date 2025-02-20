@@ -34,13 +34,27 @@ public class OrderController {
         return orderService.save(request);
     }
 
-    @GetMapping("/filter")
-    public Flux<Order> findByAuthor(@RequestParam String name) {
-        return orderService.findByFirstname(name);
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<Order> updateOrder(@PathVariable Long id, @RequestBody OrderRequest request) {
+        return orderService.updateOrder(id, request);
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable Long id) {
         orderService.deleteById(id);
     }
+
+    @PutMapping("/{orderId}/status")
+    public Mono<Order> updateOrdersStatus(@RequestBody OrderRequest request) {
+        return null;
+    }
+
+    @GetMapping("/{orderId}/subscribe")
+    public Flux<Order> streamOrderStatus(@RequestParam String status) {
+        return null;
+    }
+
+
 }
