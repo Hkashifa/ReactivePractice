@@ -6,32 +6,31 @@ import com.example.ReactivePractice.requests.OrderRequest;
 import com.example.ReactivePractice.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/order")
+@RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
 
-    @GetMapping(produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<Order> findAll() {
+    @GetMapping()
+    public Flux<Order> findAllOrders() {
         return orderService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Mono<Order> findById(@PathVariable Long id) {
+    public Mono<OrderRequest> findById(@PathVariable Long id) {
         return orderService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Order> create(@RequestBody OrderRequest request) {
-        return orderService.save(request);
+    public Mono<Order> createOrder(@RequestBody OrderRequest request) {
+        return orderService.createOrder(request);
     }
 
     @PutMapping("/{id}")
@@ -46,10 +45,6 @@ public class OrderController {
         orderService.deleteById(id);
     }
 
-    @PutMapping("/{orderId}/status")
-    public Mono<Order> updateOrdersStatus(@RequestBody OrderRequest request) {
-        return null;
-    }
 
     @GetMapping("/{orderId}/subscribe")
     public Flux<Order> streamOrderStatus(@RequestParam String status) {

@@ -1,8 +1,11 @@
 package com.example.ReactivePractice.services;
 
 
+import com.example.ReactivePractice.entities.FoodItem;
 import com.example.ReactivePractice.entities.Order;
+import com.example.ReactivePractice.entities.OrderFoodItem;
 import com.example.ReactivePractice.enums.OrderStatus;
+import com.example.ReactivePractice.repositories.OrderFoodItemRepository;
 import com.example.ReactivePractice.repositories.OrderRepository;
 import com.example.ReactivePractice.requests.OrderRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,33 +14,49 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
+import java.util.ArrayList;
+
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderFoodItemRepository orderFoodItemRepository;
     private final ModelMapper modelMapper;
 
     public Flux<Order> findAll() {
-        return orderRepository.findAll().delayElements(Duration.ofSeconds(1));
+        return orderRepository.findAll();
     }
 
-    public Mono<Order> findById(Long id) {
-        return orderRepository.findById(id)
-                .onErrorReturn(new Order(id, OrderStatus.ORDER_NONE_EXISTENT, "None", 0));
+    public Mono<OrderRequest> findById(Long id) {
+
+
+
+
+
     }
 
-    public Mono<Order> save(OrderRequest request) {
-
+    public Mono<Order> createOrder(OrderRequest request) {
         return orderRepository.save(
                 Order.builder()
                         .orderStatus(request.getOrderStatus())
-                        .item(request.getItem())
-                        .price(request.getPrice())
+                        .totalPrice(request.getTotalPrice())
                         .build()
+        ).flatMap(order ->
+                Flux.fromIterable(request.getGroupOfItem())
+                        .map(FoodItem::getId)
+                        .flatMap(foodItemId ->
+                                orderFoodItemRepository.save(
+                                        OrderFoodItem.builder()
+                                                .foodItemId(foodItemId)
+                                                .orderId(order.getId()) // No need to block
+                                                .build()
+                                )
+                        )
+                        .then(Mono.just(order)) // Return the order after saving items
         );
+
     }
 
 
@@ -51,7 +70,7 @@ public class OrderService {
                     modelMapper.map(updatedOrder, order); // Map updated fields onto existing order
                     return orderRepository.save(order); // Save and return updated order
                 })
-                .switchIfEmpty(Mono.empty()); // Return empty Mono if order is not found
+                .switchIfEmpty(Mono.empty());
     }
 
 
@@ -64,37 +83,6 @@ public class OrderService {
     public Flux<Order> findByStatus(Long id) {
         return null;
     }
-
-//    private Flux<Order> orderProcssingQueue(Order order) {
-//
-//        BlockingQueue<Order> queue = new ArrayBlockingQueue<Order>(10);
-//
-//        final Runnable producer = ()-> {
-//            while(true)
-//            {
-//                queue.put(order);
-//            }
-//        };
-//        new Thread(producer).start();
-//        new Thread(producer).start();
-//
-//        final Runnable consumer = ()-> {
-//
-//            while(true){
-//                Item i = queue.take();
-//                process(i);
-//            }
-//
-//        };
-//
-//        new Thread(consumer).start();
-//        new Thread(consumer).start();
-//
-//        Thread.sleep(1000);
-//
-//
-//
-//    }
 
 
 }
