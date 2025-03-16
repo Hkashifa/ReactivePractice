@@ -46,10 +46,5 @@ public class OrderController {
     }
 
 
-    @GetMapping("/{orderId}/subscribe")
-    public Flux<Order> streamOrderStatus(@RequestParam String status) {
-        return null;
-    }
-
 
 }

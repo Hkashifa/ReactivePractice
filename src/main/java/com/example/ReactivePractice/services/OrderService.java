@@ -4,7 +4,7 @@ package com.example.ReactivePractice.services;
 import com.example.ReactivePractice.entities.FoodItem;
 import com.example.ReactivePractice.entities.Order;
 import com.example.ReactivePractice.entities.OrderFoodItem;
-import com.example.ReactivePractice.enums.OrderStatus;
+import com.example.ReactivePractice.repositories.FoodItemRepository;
 import com.example.ReactivePractice.repositories.OrderFoodItemRepository;
 import com.example.ReactivePractice.repositories.OrderRepository;
 import com.example.ReactivePractice.requests.OrderRequest;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +21,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderFoodItemRepository orderFoodItemRepository;
+    private final FoodItemRepository foodItemRepository;
     private final ModelMapper modelMapper;
 
     public Flux<Order> findAll() {
@@ -31,9 +30,17 @@ public class OrderService {
 
     public Mono<OrderRequest> findById(Long id) {
 
-
-
-
+        return orderRepository.findById(id)
+                .flatMap(order -> orderFoodItemRepository.findAllByOrderId(id)
+                        .flatMap(orderFoodItem -> foodItemRepository.findById(orderFoodItem.getFoodItemId()))
+                        .collectList() // Collect the list reactively
+                        .map(foodItemsList -> OrderRequest.builder()
+                                .orderStatus(order.getOrderStatus()) // Using fetched order details
+                                .totalPrice(order.getTotalPrice())
+                                .groupOfItem(foodItemsList)
+                                .build()
+                        )
+                );
 
     }
 
@@ -74,15 +81,7 @@ public class OrderService {
     }
 
 
-    public Mono<Order> updateOrderStatus(Order order) {
 
-
-        return null;
-    }
-
-    public Flux<Order> findByStatus(Long id) {
-        return null;
-    }
 
 
 }
