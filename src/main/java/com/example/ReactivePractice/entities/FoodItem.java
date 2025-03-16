@@ -8,8 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 @Table("food_items")
 public class FoodItem {
 
