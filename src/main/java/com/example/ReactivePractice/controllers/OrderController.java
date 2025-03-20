@@ -41,8 +41,8 @@ public class OrderController {
 
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        orderService.deleteById(id);
+    public Mono<Void> deleteById(@PathVariable Long id) {
+        return orderService.deleteOrderById(id);
     }
 
 
